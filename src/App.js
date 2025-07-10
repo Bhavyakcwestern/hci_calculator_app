@@ -3,6 +3,7 @@ import DigitButton from "./DigitButton"
 import OperationButton from "./OperationButton"
 import "./styles.css"
 
+// Action types for calculator operations
 export const ACTIONS = {
   ADD_DIGIT: "add-digit",
   CHOOSE_OPERATION: "choose-operation",
@@ -11,10 +12,12 @@ export const ACTIONS = {
   EVALUATE: "evaluate",
 }
 
+// Reducer function to manage calculator state transitions
 function reducer(state, { type, payload }) {
   switch (type) {
     case ACTIONS.ADD_DIGIT:
-      // So if state is overwrite we change current operand to digit we overwrite
+      // Add digit or decimal point to the current operand
+      // If overwrite flag is set, replace the current operand
       if (state.overwrite) {
         return {
           ...state,
@@ -22,10 +25,12 @@ function reducer(state, { type, payload }) {
           overwrite: false,
         }
       }
+      // Prevent multiple leading zeros 
       if (payload.digit === "0" && state.currentOperand === "0") {
         return state
       }
-      if (payload.digit === "." && state.currentOperand.includes(".")) {
+      // Prevent more than one decimal point
+      if (payload.digit === "." && state.currentOperand?.includes(".")) {
         return state
       }
 
@@ -33,18 +38,21 @@ function reducer(state, { type, payload }) {
         ...state,
         currentOperand: `${state.currentOperand || ""}${payload.digit}`,
       }
-    case ACTIONS.CHOOSE_OPERATION://If we choose and Operend
+
+    case ACTIONS.CHOOSE_OPERATION:
+      // Set or update the selected operation
+      // If no operands present, do nothing
       if (state.currentOperand == null && state.previousOperand == null) {
         return state
       }
-      //State will change to the current operand that we will select if it is originaly null
+      // Change operation if only previous operand exists
       if (state.currentOperand == null) {
         return {
           ...state,
           operation: payload.operation,
         }
       }
-      //If we choose and operand the currentstate will normally change to null and previous state will be our current state
+      // State changes to null when operator is selected and previous state changes to current State
       if (state.previousOperand == null) {
         return {
           ...state,
@@ -53,16 +61,20 @@ function reducer(state, { type, payload }) {
           currentOperand: null,
         }
       }
-
+      // Compute existing expression and previous state changes to the evaluate result
       return {
         ...state,
         previousOperand: evaluate(state),
         operation: payload.operation,
         currentOperand: null,
       }
+
     case ACTIONS.CLEAR:
+      // Reset all state to initial empty values
       return {}
+
     case ACTIONS.DELETE_DIGIT:
+      // Delete last digit or clear on overwrite
       if (state.overwrite) {
         return {
           ...state,
@@ -71,15 +83,17 @@ function reducer(state, { type, payload }) {
         }
       }
       if (state.currentOperand == null) return state
+      // Remove the last character, or clear if only one remains
       if (state.currentOperand.length === 1) {
         return { ...state, currentOperand: null }
       }
-
       return {
         ...state,
         currentOperand: state.currentOperand.slice(0, -1),
       }
+
     case ACTIONS.EVALUATE:
+      // Evaluate the expression when '=' is pressed 
       if (
         state.operation == null ||
         state.currentOperand == null ||
@@ -87,7 +101,6 @@ function reducer(state, { type, payload }) {
       ) {
         return state
       }
-
       return {
         ...state,
         overwrite: true,
@@ -95,9 +108,13 @@ function reducer(state, { type, payload }) {
         operation: null,
         currentOperand: evaluate(state),
       }
+
+    default:
+      return state
   }
 }
 
+// Helper to perform arithmetic based on current operation
 function evaluate({ currentOperand, previousOperand, operation }) {
   const prev = parseFloat(previousOperand)
   const current = parseFloat(currentOperand)
@@ -117,13 +134,14 @@ function evaluate({ currentOperand, previousOperand, operation }) {
       computation = prev / current
       break
   }
-
   return computation.toString()
 }
-//Integer formatter
+
+// Format numbers with commas for integer part
 const INTEGER_FORMATTER = new Intl.NumberFormat("en-us", {
   maximumFractionDigits: 0,
 })
+
 function formatOperand(operand) {
   if (operand == null) return
   const [integer, decimal] = operand.split(".")
@@ -131,6 +149,7 @@ function formatOperand(operand) {
   return `${INTEGER_FORMATTER.format(integer)}.${decimal}`
 }
 
+// Main App component rendering calculator UI
 function App() {
   const [{ currentOperand, previousOperand, operation }, dispatch] = useReducer(
     reducer,

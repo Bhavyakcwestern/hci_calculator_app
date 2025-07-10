@@ -1,61 +1,62 @@
-/* keep your reset */
+/* styles.css */
+/* reset */
 *, *::before, *::after {
   box-sizing: border-box;
 }
 
-/* purple page background */
 body {
   margin: 0;
   background-color: #4F2683; /* Western purple */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
 }
 
-/* your grid stays the same */
+/* 4×6 grid: 1 for display + 5 for buttons */
 .calculator-grid {
   display: grid;
-  margin-top: 2rem;
-  justify-content: center;
   grid-template-columns: repeat(4, 6rem);
-  grid-template-rows: minmax(7rem, auto) repeat(5, 6rem);
+  grid-template-rows: minmax(5rem, auto) repeat(5, 6rem);
+  gap: 1px;
+  background: #4F2683;
 }
 
-/* white buttons with purple text */
-.calculator-grid > button {
-  cursor: pointer;
-  font-size: 2rem;
-  border: 1px solid #ffffff;               /* white border */
-  outline: none;
-  background-color: rgba(255, 255, 255, .75);
-  color: #4F2683;                          /* purple text */
-}
-
-.calculator-grid > button:hover,
-.calculator-grid > button:focus {
-  background-color: rgba(255, 255, 255, .9);
-}
-
-.span-two {
-  grid-column: span 2;
-}
-
-/* white output panel with purple text */
+/* Display spans all 4 columns */
 .output {
   grid-column: 1 / -1;
-  background-color: rgba(255, 255, 255, .75);
+  background-color: rgba(255, 255, 255, 0.8);
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  justify-content: space-around;
-  padding: .75rem;
-  word-wrap: break-word;
-  word-break: break-all;
+  justify-content: center;
+  padding: 0.5rem;
+  font-size: 1.5rem;
+  color: #4F2683;
 }
 
 .output .previous-operand {
-  color: rgba(79, 38, 131, .75); /* semi-transparent purple */
-  font-size: 1.5rem;
+  font-size: 1rem;
+  opacity: 0.7;
 }
 
 .output .current-operand {
-  color: #4F2683;               /* full purple */
-  font-size: 2.5rem;
+  font-size: 2rem;
+}
+
+/* All buttons */
+.calculator-grid button,
+.calculator-grid .digit-button,
+.calculator-grid .operation-button {
+  font-size: 1.5rem;
+  border: none;
+  background: rgba(255, 255, 255, 0.75);
+  color: #4F2683;
+  cursor: pointer;
+}
+
+.calculator-grid button:hover,
+.calculator-grid .digit-button:hover,
+.calculator-grid .operation-button:hover {
+  background: rgba(255, 255, 255, 0.9);
 }
